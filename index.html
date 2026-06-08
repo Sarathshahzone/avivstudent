@@ -126,10 +126,10 @@
   <div id="config-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-card">
       <h2 id="modal-title" class="modal-title">Connect Google Sheet</h2>
-      <p class="modal-subtitle">Enter your published CSV URL and credentials to link your spreadsheet.</p>
+      <p id="modal-subtitle" class="modal-subtitle">Enter your published CSV URL and credentials to link your spreadsheet.</p>
       
       <form id="config-form" novalidate>
-        <div class="form-group">
+        <div id="group-csv-url" class="form-group">
           <label for="modal-csv-url">Published CSV URL</label>
           <input type="url" id="modal-csv-url" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" autocomplete="off" required>
         </div>

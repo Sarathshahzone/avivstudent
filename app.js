@@ -15,6 +15,7 @@ const state = {
   selectedDate: null,         // Standardized date string YYYY-MM-DD
   attendanceData: {},         // DateString -> Array of {name, status}
   dateOrder: [],              // List of dates in order they appeared in file
+  modalMode: 'connect',       // 'connect' or 'disconnect'
   
   // Calendar View State
   currentCalendarYear: new Date().getFullYear(),
@@ -47,6 +48,10 @@ const elements = {
   modalPassword: document.getElementById('modal-password'),
   modalErrorText: document.getElementById('modal-error-text'),
   btnModalCancel: document.getElementById('btn-modal-cancel'),
+  modalTitle: document.getElementById('modal-title'),
+  modalSubtitle: document.getElementById('modal-subtitle'),
+  groupCsvUrl: document.getElementById('group-csv-url'),
+  btnModalSubmit: document.getElementById('btn-modal-submit'),
   
   // Calendar DOM
   btnCalendarToggle: document.getElementById('btn-calendar-toggle'),
@@ -133,13 +138,20 @@ function setupEventListeners() {
     elements.menuDropdown.classList.add('hidden');
     
     if (state.googleSheetCsvUrl) {
-      if (confirm('Are you sure you want to disconnect your Google Sheet? The app will revert back to showing dummy data.')) {
-        state.googleSheetCsvUrl = '';
-        localStorage.removeItem('student_attendance_sheet_url');
-        updateConnectButtonText();
-        fetchBoardData();
-      }
+      // Set to disconnect mode
+      state.modalMode = 'disconnect';
+      elements.modalTitle.textContent = 'Disconnect Google Sheet';
+      elements.modalSubtitle.textContent = 'Enter your admin password to disconnect and revert to dummy data.';
+      elements.groupCsvUrl.style.display = 'none';
+      elements.btnModalSubmit.textContent = 'Disconnect Sheet';
+      openModal();
     } else {
+      // Set to connect mode
+      state.modalMode = 'connect';
+      elements.modalTitle.textContent = 'Connect Google Sheet';
+      elements.modalSubtitle.textContent = 'Enter your published CSV URL and credentials to link your spreadsheet.';
+      elements.groupCsvUrl.style.display = 'flex';
+      elements.btnModalSubmit.textContent = 'Connect Sheet';
       openModal();
     }
   });
@@ -147,7 +159,7 @@ function setupEventListeners() {
   // Cancel Connect Modal
   elements.btnModalCancel.addEventListener('click', closeModal);
 
-  // Form Submit for connection
+  // Form Submit for connection / disconnection
   elements.configForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const url = elements.modalCsvUrl.value.trim();
@@ -155,19 +167,31 @@ function setupEventListeners() {
 
     elements.modalErrorText.classList.add('hidden');
 
-    if (!url) {
-      alert('Please enter a Google Sheets CSV or API URL.');
-      return;
-    }
+    if (state.modalMode === 'connect') {
+      if (!url) {
+        alert('Please enter a Google Sheets CSV or API URL.');
+        return;
+      }
 
-    if (password === 'sarathanjo') {
-      state.googleSheetCsvUrl = url;
-      localStorage.setItem('student_attendance_sheet_url', url);
-      closeModal();
-      updateConnectButtonText();
-      fetchBoardData();
-    } else {
-      elements.modalErrorText.classList.remove('hidden');
+      if (password === 'sarathanjo') {
+        state.googleSheetCsvUrl = url;
+        localStorage.setItem('student_attendance_sheet_url', url);
+        closeModal();
+        updateConnectButtonText();
+        fetchBoardData();
+      } else {
+        elements.modalErrorText.classList.remove('hidden');
+      }
+    } else if (state.modalMode === 'disconnect') {
+      if (password === 'sarathanjo') {
+        state.googleSheetCsvUrl = '';
+        localStorage.removeItem('student_attendance_sheet_url');
+        closeModal();
+        updateConnectButtonText();
+        fetchBoardData();
+      } else {
+        elements.modalErrorText.classList.remove('hidden');
+      }
     }
   });
 
@@ -223,7 +247,12 @@ function openModal() {
   elements.modalPassword.value = '';
   elements.modalErrorText.classList.add('hidden');
   elements.configModal.classList.remove('hidden');
-  elements.modalCsvUrl.focus();
+  
+  if (state.modalMode === 'connect') {
+    elements.modalCsvUrl.focus();
+  } else {
+    elements.modalPassword.focus();
+  }
 }
 
 function closeModal() {
