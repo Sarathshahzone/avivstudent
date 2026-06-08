@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Student Attendance Board</title>
+  <meta name="description" content="View daily student attendance records in a clean, modern, and mobile-friendly dashboard.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Animated background blur layers -->
+  <div class="bg-blur-blob blob-1"></div>
+  <div class="bg-blur-blob blob-2"></div>
+  <div class="bg-blur-blob blob-3"></div>
+
+  <!-- Main App Shell -->
+  <div id="app" class="app-container">
+    
+    <!-- 1. LOADING VIEW -->
+    <div id="view-loading" class="app-view">
+      <div class="loader-content">
+        <div class="spinner">
+          <div class="spinner-inner"></div>
+        </div>
+        <p id="loading-text">Fetching attendance board...</p>
+      </div>
+    </div>
+
+    <!-- 2. VIEWER VIEW (Main student board, visible after load) -->
+    <div id="view-viewer" class="app-view hidden">
+      <header class="viewer-header">
+        <div class="header-top">
+          <span class="status-indicator">
+            <span class="pulse-dot"></span>
+            LATEST ATTENDANCE
+          </span>
+          
+          <!-- Header Actions -->
+          <div class="header-actions">
+            <!-- Calendar Icon Button -->
+            <button id="btn-calendar-toggle" class="btn-icon" aria-label="Open calendar selector">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </button>
+
+            <!-- 3-Dot Menu Container -->
+            <div class="menu-container">
+              <button id="btn-menu-toggle" class="btn-icon" aria-label="Open settings menu" aria-haspopup="true" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="1.5"></circle>
+                  <circle cx="12" cy="5" r="1.5"></circle>
+                  <circle cx="12" cy="19" r="1.5"></circle>
+                </svg>
+              </button>
+              
+              <!-- Dropdown Menu -->
+              <div id="menu-dropdown" class="dropdown-menu hidden">
+                <button id="btn-connect-trigger" class="dropdown-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  <span id="txt-connect-trigger">Connect Sheet</span>
+                </button>
+
+                <button id="btn-refresh" class="dropdown-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                  </svg>
+                  <span>Refresh Board</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <h1 id="viewer-date-display" class="date-title">Loading Date...</h1>
+      </header>
+
+      <main class="viewer-main">
+        <!-- Present Students Group -->
+        <section class="attendance-group present-group">
+          <h2 class="group-title">
+            <span class="title-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+            Present
+            <span id="badge-count-present" class="count-badge">0</span>
+          </h2>
+          <div id="container-present-pills" class="pills-grid">
+            <!-- Dynamically populated pills -->
+          </div>
+        </section>
+
+        <!-- Absent Students Group -->
+        <section class="attendance-group absent-group">
+          <h2 class="group-title">
+            <span class="title-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </span>
+            Absent
+            <span id="badge-count-absent" class="count-badge">0</span>
+          </h2>
+          <div id="container-absent-pills" class="pills-grid">
+            <!-- Dynamically populated pills -->
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Connect Sheet Modal Overlay -->
+  <div id="config-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <h2 id="modal-title" class="modal-title">Connect Google Sheet</h2>
+      <p class="modal-subtitle">Enter your published CSV URL and credentials to link your spreadsheet.</p>
+      
+      <form id="config-form" novalidate>
+        <div class="form-group">
+          <label for="modal-csv-url">Published CSV URL</label>
+          <input type="url" id="modal-csv-url" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" autocomplete="off" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="modal-password">Admin Password</label>
+          <input type="password" id="modal-password" placeholder="Enter password" required>
+          <span id="modal-error-text" class="modal-error hidden">Incorrect password.</span>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" id="btn-modal-cancel" class="btn-secondary">Cancel</button>
+          <button type="submit" id="btn-modal-submit" class="btn-primary">Connect Sheet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Calendar Selector Modal Overlay -->
+  <div id="calendar-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="calendar-month-year">
+    <div class="modal-card calendar-card">
+      <div class="calendar-header">
+        <button id="btn-cal-prev" class="btn-icon-small" aria-label="Previous month">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <span id="calendar-month-year" class="calendar-month-year-label">Loading Month...</span>
+        <button id="btn-cal-next" class="btn-icon-small" aria-label="Next month">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="calendar-weekdays">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div id="calendar-days-grid" class="calendar-days-grid">
+        <!-- Dynamic calendar day buttons -->
+      </div>
+      <div class="modal-actions" style="margin-top: 4px;">
+        <button type="button" id="btn-cal-close" class="btn-secondary" style="width: 100%;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
