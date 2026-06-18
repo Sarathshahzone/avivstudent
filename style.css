@@ -782,22 +782,14 @@ body {
 }
 
 .danger-vibe .student-percent {
-  font-size: 52px;
-  font-weight: 800;
+  font-size: 72px;
+  font-weight: 900;
   text-align: center;
   display: block;
-  margin: 12px 0 4px;
+  margin: 20px 0 20px;
   color: #ef4444; /* Danger red */
-  text-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
-}
-
-.danger-vibe .student-ratio {
-  font-size: 13px;
-  text-align: center;
-  display: block;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
+  text-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+  letter-spacing: -1px;
 }
 
 .danger-vibe .student-info-message {
@@ -826,21 +818,13 @@ body {
 }
 
 .safe-vibe .student-percent {
-  font-size: 52px;
-  font-weight: 800;
+  font-size: 72px;
+  font-weight: 900;
   text-align: center;
   display: block;
-  margin: 12px 0 4px;
+  margin: 20px 0 20px;
   color: var(--color-success) !important; /* Emerald green */
-}
-
-.safe-vibe .student-ratio {
-  font-size: 13px;
-  text-align: center;
-  display: block;
-  font-weight: 600;
-  color: #475569 !important;
-  margin-bottom: 16px;
+  letter-spacing: -1px;
 }
 
 .safe-vibe .student-info-message {

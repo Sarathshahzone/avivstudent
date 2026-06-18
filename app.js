@@ -67,7 +67,6 @@ const elements = {
   studentModalCard: document.getElementById('student-modal-card'),
   studentModalName: document.getElementById('student-modal-name'),
   studentModalPercent: document.getElementById('student-modal-percent'),
-  studentModalRatio: document.getElementById('student-modal-ratio'),
   btnStudentClose: document.getElementById('btn-student-close')
 };
 
@@ -746,7 +745,6 @@ function openStudentDetails(studentName) {
   // Populate HTML elements inside student modal
   elements.studentModalName.textContent = studentName;
   elements.studentModalPercent.textContent = `${percentage}%`;
-  elements.studentModalRatio.textContent = `Present: ${presentDays} of ${totalDays} days`;
 
   // Apply visual theme based on the 90% attendance criteria
   if (percentage < 90) {
