@@ -389,10 +389,17 @@ function processJsonContent(jsonData) {
       Object.keys(records).forEach(studentId => {
         const studentName = studentMap[studentId] || studentId;
         const rawStatus = records[studentId] || 'absent';
+        let status = 'Absent';
+        
+        if (rawStatus.trim().toLowerCase() === 'present') {
+          status = 'Present';
+        } else if (rawStatus.trim().toLowerCase() === 'half') {
+          status = 'Half';
+        }
 
         state.attendanceData[dateKey].push({
           name: studentName,
-          status: rawStatus.toLowerCase().includes('absent') ? 'Absent' : 'Present'
+          status: status
         });
       });
     });
@@ -483,9 +490,17 @@ function processCsvContent(csvText) {
         state.dateOrder.push(dateKey);
       }
 
+      let status = 'Absent';
+      const cleanStatus = rawStatus.trim().toLowerCase();
+      if (cleanStatus === 'present') {
+        status = 'Present';
+      } else if (cleanStatus === 'half') {
+        status = 'Half';
+      }
+
       state.attendanceData[dateKey].push({
         name: rawName,
-        status: rawStatus.toLowerCase().includes('absent') ? 'Absent' : 'Present'
+        status: status
       });
     }
 
@@ -687,33 +702,46 @@ function renderBoard() {
   elements.dateDisplay.textContent = getDisplayDate(state.selectedDate);
 
   // Group Students
-  const presentList = records
-    .filter(r => r.status === 'Present')
-    .map(r => r.name)
-    .sort((a, b) => a.localeCompare(b));
+  const presentList = [];
+  const absentList = [];
+  let presentSum = 0;
+  let absentSum = 0;
 
-  const absentList = records
-    .filter(r => r.status === 'Absent')
-    .map(r => r.name)
-    .sort((a, b) => a.localeCompare(b));
+  records.forEach(r => {
+    if (r.status === 'Present') {
+      presentSum += 1;
+      presentList.push({ name: r.name, label: '' });
+    } else if (r.status === 'Half') {
+      presentSum += 0.5;
+      absentSum += 0.5;
+      presentList.push({ name: r.name, label: ' (Half Day)' });
+      absentList.push({ name: r.name, label: ' (Half Day)' });
+    } else {
+      absentSum += 1;
+      absentList.push({ name: r.name, label: '' });
+    }
+  });
+
+  presentList.sort((a, b) => a.name.localeCompare(b.name));
+  absentList.sort((a, b) => a.name.localeCompare(b.name));
 
   // Render Present
-  elements.presentCount.textContent = presentList.length;
+  elements.presentCount.textContent = presentSum;
   if (presentList.length === 0) {
     elements.presentContainer.innerHTML = '<div class="empty-group-text">No students marked present.</div>';
   } else {
     elements.presentContainer.innerHTML = presentList
-      .map((name, idx) => `<span class="student-pill" style="animation-delay: ${idx * 0.03}s">${escapeHTML(name)}</span>`)
+      .map((item, idx) => `<span class="student-pill" style="animation-delay: ${idx * 0.03}s">${escapeHTML(item.name + item.label)}</span>`)
       .join('');
   }
 
   // Render Absent
-  elements.absentCount.textContent = absentList.length;
+  elements.absentCount.textContent = absentSum;
   if (absentList.length === 0) {
     elements.absentContainer.innerHTML = '<div class="empty-group-text">No students marked absent.</div>';
   } else {
     elements.absentContainer.innerHTML = absentList
-      .map((name, idx) => `<span class="student-pill" style="animation-delay: ${idx * 0.03}s">${escapeHTML(name)}</span>`)
+      .map((item, idx) => `<span class="student-pill" style="animation-delay: ${idx * 0.03}s">${escapeHTML(item.name + item.label)}</span>`)
       .join('');
   }
 }
@@ -729,11 +757,12 @@ function showView(viewName) {
 }
 
 // Open and populate student attendance summary details modal
-function openStudentDetails(studentName) {
+function openStudentDetails(studentNameInput) {
+  const studentName = studentNameInput.replace(/\s*\(Half Day\)\s*$/, '').trim();
   let totalDays = 0;
   let presentDays = 0;
 
-  const studentCourse = state.studentCourses ? state.studentCourses[studentName.trim().toLowerCase()] : '6 Month';
+  const studentCourse = state.studentCourses ? state.studentCourses[studentName.toLowerCase()] : '6 Month';
 
   // Traverse all dates in the parsed attendance dataset
   Object.keys(state.attendanceData).forEach(dateKey => {
@@ -743,11 +772,13 @@ function openStudentDetails(studentName) {
     }
 
     const records = state.attendanceData[dateKey] || [];
-    const record = records.find(r => r.name.trim().toLowerCase() === studentName.trim().toLowerCase());
+    const record = records.find(r => r.name.trim().toLowerCase() === studentName.toLowerCase());
     if (record) {
       totalDays++;
       if (record.status === 'Present') {
         presentDays++;
+      } else if (record.status === 'Half') {
+        presentDays += 0.5;
       }
     }
   });
