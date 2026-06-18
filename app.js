@@ -60,7 +60,15 @@ const elements = {
   btnCalNext: document.getElementById('btn-cal-next'),
   calendarMonthYear: document.getElementById('calendar-month-year'),
   calendarDaysGrid: document.getElementById('calendar-days-grid'),
-  btnCalClose: document.getElementById('btn-cal-close')
+  btnCalClose: document.getElementById('btn-cal-close'),
+  
+  // Student Details Modal DOM
+  studentModal: document.getElementById('student-modal'),
+  studentModalCard: document.getElementById('student-modal-card'),
+  studentModalName: document.getElementById('student-modal-name'),
+  studentModalPercent: document.getElementById('student-modal-percent'),
+  studentModalRatio: document.getElementById('student-modal-ratio'),
+  btnStudentClose: document.getElementById('btn-student-close')
 };
 
 // Hardcoded Dummy Data matching sheet structure: Date, StudentID, Student Name, Status, Timestamp
@@ -228,6 +236,33 @@ function setupEventListeners() {
       state.currentCalendarYear++;
     }
     drawCalendarGrid();
+  });
+
+  // Close Student Modal
+  elements.btnStudentClose.addEventListener('click', () => {
+    elements.studentModal.classList.add('hidden');
+  });
+
+  // Close student modal when clicking the overlay background
+  elements.studentModal.addEventListener('click', (e) => {
+    if (e.target === elements.studentModal) {
+      elements.studentModal.classList.add('hidden');
+    }
+  });
+
+  // Event Delegation for Student Name Pills in Present/Absent Containers
+  elements.presentContainer.addEventListener('click', (e) => {
+    const pill = e.target.closest('.student-pill');
+    if (pill) {
+      openStudentDetails(pill.textContent.trim());
+    }
+  });
+
+  elements.absentContainer.addEventListener('click', (e) => {
+    const pill = e.target.closest('.student-pill');
+    if (pill) {
+      openStudentDetails(pill.textContent.trim());
+    }
   });
 }
 
@@ -687,6 +722,43 @@ function showView(viewName) {
       views[key].classList.add('hidden');
     }
   });
+}
+
+// Open and populate student attendance summary details modal
+function openStudentDetails(studentName) {
+  let totalDays = 0;
+  let presentDays = 0;
+
+  // Traverse all dates in the parsed attendance dataset
+  Object.keys(state.attendanceData).forEach(dateKey => {
+    const records = state.attendanceData[dateKey] || [];
+    const record = records.find(r => r.name.trim().toLowerCase() === studentName.trim().toLowerCase());
+    if (record) {
+      totalDays++;
+      if (record.status === 'Present') {
+        presentDays++;
+      }
+    }
+  });
+
+  const percentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+
+  // Populate HTML elements inside student modal
+  elements.studentModalName.textContent = studentName;
+  elements.studentModalPercent.textContent = `${percentage}%`;
+  elements.studentModalRatio.textContent = `Present: ${presentDays} of ${totalDays} days`;
+
+  // Apply visual theme based on the 90% attendance criteria
+  if (percentage < 90) {
+    elements.studentModalCard.classList.add('danger-vibe');
+    elements.studentModalCard.classList.remove('safe-vibe');
+  } else {
+    elements.studentModalCard.classList.add('safe-vibe');
+    elements.studentModalCard.classList.remove('danger-vibe');
+  }
+
+  // Display the modal
+  elements.studentModal.classList.remove('hidden');
 }
 
 // HTML Escaping to prevent XSS injection

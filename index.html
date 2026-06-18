@@ -176,6 +176,27 @@
     </div>
   </div>
 
+  <!-- Student Details Modal Overlay -->
+  <div id="student-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="student-modal-name">
+    <div id="student-modal-card" class="modal-card student-details-card">
+      <h2 id="student-modal-name" class="modal-title">Student Name</h2>
+      <p id="student-modal-subtitle" class="modal-subtitle">Individual Attendance Summary</p>
+      
+      <div class="student-stats-box">
+        <span id="student-modal-percent" class="student-percent">0%</span>
+        <span id="student-modal-ratio" class="student-ratio">Present: 0 of 0 days</span>
+      </div>
+      
+      <p id="student-modal-message" class="student-info-message">
+        Minimum attendance required for internship is 90%.
+      </p>
+      
+      <div class="modal-actions" style="margin-top: 10px;">
+        <button type="button" id="btn-student-close" class="btn-secondary" style="width: 100%;">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

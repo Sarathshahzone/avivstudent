@@ -753,3 +753,116 @@ body {
   box-shadow: inset 0 0 0 1.5px var(--color-accent);
   color: #fff;
 }
+
+/* ----------------------------------------------------
+   5. STUDENT DETAILS POPUP STYLES
+---------------------------------------------------- */
+.student-pill {
+  cursor: pointer; /* Clickable */
+}
+
+/* Base popup details card override */
+.student-details-card {
+  transition: background-color var(--transition-normal), border var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+/* Danger Vibe: below 90% attendance */
+.student-details-card.danger-vibe {
+  background: rgba(30, 9, 12, 0.96);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 0 12px 40px rgba(239, 68, 68, 0.22);
+}
+
+.danger-vibe .modal-title {
+  color: #fff;
+}
+
+.danger-vibe .modal-subtitle {
+  color: #f87171;
+}
+
+.danger-vibe .student-percent {
+  font-size: 52px;
+  font-weight: 800;
+  text-align: center;
+  display: block;
+  margin: 12px 0 4px;
+  color: #ef4444; /* Danger red */
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+}
+
+.danger-vibe .student-ratio {
+  font-size: 13px;
+  text-align: center;
+  display: block;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.danger-vibe .student-info-message {
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.5;
+  color: #fca5a5;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+  margin-top: 10px;
+}
+
+/* Safe Vibe: 90% and above - White Background, Green text */
+.student-details-card.safe-vibe {
+  background: #ffffff !important;
+  border: 1px solid rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.safe-vibe .modal-title {
+  color: #0f172a !important; /* Dark Slate Title */
+}
+
+.safe-vibe .modal-subtitle {
+  color: #64748b !important;
+}
+
+.safe-vibe .student-percent {
+  font-size: 52px;
+  font-weight: 800;
+  text-align: center;
+  display: block;
+  margin: 12px 0 4px;
+  color: var(--color-success) !important; /* Emerald green */
+}
+
+.safe-vibe .student-ratio {
+  font-size: 13px;
+  text-align: center;
+  display: block;
+  font-weight: 600;
+  color: #475569 !important;
+  margin-bottom: 16px;
+}
+
+.safe-vibe .student-info-message {
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.5;
+  color: #475569 !important;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08) !important;
+  padding-top: 14px;
+  margin-top: 10px;
+}
+
+/* Override cancel/secondary button inside safe light modal */
+.safe-vibe .btn-secondary {
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
+  background: #f8fafc !important;
+}
+
+.safe-vibe .btn-secondary:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
