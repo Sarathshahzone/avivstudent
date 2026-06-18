@@ -16,6 +16,7 @@ const state = {
   attendanceData: {},         // DateString -> Array of {name, status}
   dateOrder: [],              // List of dates in order they appeared in file
   modalMode: 'connect',       // 'connect' or 'disconnect'
+  studentCourses: {},         // studentName (lowercase) -> course type
   
   // Calendar View State
   currentCalendarYear: new Date().getFullYear(),
@@ -362,10 +363,14 @@ function processJsonContent(jsonData) {
     const students = jsonData.students || [];
     const attendance = jsonData.attendance || {};
 
-    // Map student IDs to Names
+    // Map student IDs to Names and Courses
     const studentMap = {};
+    state.studentCourses = {};
     students.forEach(s => {
       studentMap[s.id] = s.name;
+      if (s.name && s.course) {
+        state.studentCourses[s.name.trim().toLowerCase()] = s.course;
+      }
     });
 
     state.attendanceData = {};
@@ -728,8 +733,15 @@ function openStudentDetails(studentName) {
   let totalDays = 0;
   let presentDays = 0;
 
+  const studentCourse = state.studentCourses ? state.studentCourses[studentName.trim().toLowerCase()] : '6 Month';
+
   // Traverse all dates in the parsed attendance dataset
   Object.keys(state.attendanceData).forEach(dateKey => {
+    // Skip Saturdays for 1 Year students
+    if (studentCourse === '1 Year' && isSaturday(dateKey)) {
+      return;
+    }
+
     const records = state.attendanceData[dateKey] || [];
     const record = records.find(r => r.name.trim().toLowerCase() === studentName.trim().toLowerCase());
     if (record) {
@@ -770,6 +782,16 @@ function escapeHTML(str) {
       '"': '&quot;'
     }[tag] || tag)
   );
+}
+
+// Check if a date string represents a Saturday (YYYY-MM-DD format)
+function isSaturday(dateStr) {
+  if (!dateStr || dateStr === 'Unknown Date') return false;
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return false;
+  const [year, month, day] = parts.map(Number);
+  const dateObj = new Date(year, month - 1, day);
+  return dateObj.getDay() === 6; // 6 is Saturday
 }
 
 // DOM content loaded entry
